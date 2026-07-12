@@ -142,83 +142,87 @@ export function AllocationsPage() {
 
       {activeTab === 'active' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden animate-fade-in shadow-sm">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Asset</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Allocated To</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Since</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Return By</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allocations.filter(a => a.status === AllocationStatus.ACTIVE).map((alloc) => (
-                <tr key={alloc.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <div>
-                      <code className="font-mono text-xs text-teal-600 dark:text-teal-400">{alloc.asset?.assetTag}</code>
-                      <p className="text-sm text-slate-900 dark:text-slate-100">{alloc.asset?.name}</p>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-slate-900 dark:text-slate-100">{alloc.employee?.name || '—'}</td>
-                  <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
-                    {new Date(alloc.allocatedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm hidden md:table-cell">
-                    {alloc.expectedReturnDate ? (
-                      <span className={new Date(alloc.expectedReturnDate) < new Date() ? 'text-red-500 font-medium' : 'text-slate-500 dark:text-slate-400'}>
-                        {new Date(alloc.expectedReturnDate).toLocaleDateString()}
-                        {new Date(alloc.expectedReturnDate) < new Date() && ' (overdue)'}
-                      </span>
-                    ) : '—'}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <Button variant="outline" size="sm">Return</Button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Asset</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Allocated To</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Since</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Return By</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {allocations.filter(a => a.status === AllocationStatus.ACTIVE).map((alloc) => (
+                  <tr key={alloc.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <div>
+                        <code className="font-mono text-xs text-teal-600 dark:text-teal-400">{alloc.asset?.assetTag}</code>
+                        <p className="text-sm text-slate-900 dark:text-slate-100">{alloc.asset?.name}</p>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 text-sm text-slate-900 dark:text-slate-100">{alloc.employee?.name || '—'}</td>
+                    <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
+                      {new Date(alloc.allocatedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-3.5 text-sm hidden md:table-cell">
+                      {alloc.expectedReturnDate ? (
+                        <span className={new Date(alloc.expectedReturnDate) < new Date() ? 'text-red-500 font-medium' : 'text-slate-500 dark:text-slate-400'}>
+                          {new Date(alloc.expectedReturnDate).toLocaleDateString()}
+                          {new Date(alloc.expectedReturnDate) < new Date() && ' (overdue)'}
+                        </span>
+                      ) : '—'}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <Button variant="outline" size="sm">Return</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'transfers' && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden animate-fade-in shadow-sm">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Transfer</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Date</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transfers.map((transfer) => (
-                <tr key={transfer.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <p className="text-sm text-slate-900 dark:text-slate-100">
-                      {transfer.fromHolder} <ArrowRight className="w-3 h-3 inline mx-1 text-slate-400" /> {transfer.toHolder}
-                    </p>
-                    {transfer.reason && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-xs">{transfer.reason}</p>}
-                  </td>
-                  <td className="px-5 py-3.5"><TransferStatusBadge status={transfer.status} /></td>
-                  <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
-                    {new Date(transfer.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {transfer.status === 'REQUESTED' && (
-                      <div className="flex gap-2">
-                        <Button variant="primary" size="sm" icon={<Check className="w-3.5 h-3.5" />}>Approve</Button>
-                        <Button variant="destructive" size="sm" icon={<X className="w-3.5 h-3.5" />}>Reject</Button>
-                      </div>
-                    )}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Transfer</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Date</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {transfers.map((transfer) => (
+                  <tr key={transfer.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td className="px-5 py-3.5">
+                      <p className="text-sm text-slate-900 dark:text-slate-100">
+                        {transfer.fromHolder} <ArrowRight className="w-3 h-3 inline mx-1 text-slate-400" /> {transfer.toHolder}
+                      </p>
+                      {transfer.reason && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-xs">{transfer.reason}</p>}
+                    </td>
+                    <td className="px-5 py-3.5"><TransferStatusBadge status={transfer.status} /></td>
+                    <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
+                      {new Date(transfer.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {transfer.status === 'REQUESTED' && (
+                        <div className="flex gap-2">
+                          <Button variant="primary" size="sm" icon={<Check className="w-3.5 h-3.5" />}>Approve</Button>
+                          <Button variant="destructive" size="sm" icon={<X className="w-3.5 h-3.5" />}>Reject</Button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
