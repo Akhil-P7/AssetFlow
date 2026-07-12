@@ -129,11 +129,11 @@ export const transfers: TransferRequest[] = [
 const today = new Date();
 const todayStr = today.toISOString().split('T')[0];
 export const bookings: Booking[] = [
-  { id: 'b-001', resourceAssetId: 'a-004', resource: assets[3], bookedBy: 'u-004', bookedByEmployee: allEmployees[3], startTime: `${todayStr}T09:00:00Z`, endTime: `${todayStr}T10:00:00Z`, status: BookingStatus.ONGOING, cancelledReason: null, createdAt: ago(1) },
-  { id: 'b-002', resourceAssetId: 'a-004', resource: assets[3], bookedBy: 'u-003', bookedByEmployee: allEmployees[2], startTime: `${todayStr}T10:00:00Z`, endTime: `${todayStr}T11:30:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
-  { id: 'b-003', resourceAssetId: 'a-004', resource: assets[3], bookedBy: 'u-005', bookedByEmployee: extraEmployees[0], startTime: `${todayStr}T14:00:00Z`, endTime: `${todayStr}T15:00:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
-  { id: 'b-004', resourceAssetId: 'a-005', resource: assets[4], bookedBy: 'u-004', bookedByEmployee: allEmployees[3], startTime: `${todayStr}T11:00:00Z`, endTime: `${todayStr}T12:00:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
-  { id: 'b-005', resourceAssetId: 'a-006', resource: assets[5], bookedBy: 'u-001', bookedByEmployee: allEmployees[0], startTime: `${todayStr}T08:00:00Z`, endTime: `${todayStr}T17:00:00Z`, status: BookingStatus.ONGOING, cancelledReason: null, createdAt: ago(2) },
+  { id: 'b-001', timeRange: "2026-07-14 09:00:00", resourceId: 'a-004', resource: assets[3], bookedBy: 'u-004', bookedByEmployee: allEmployees[3], startTime: `${todayStr}T09:00:00Z`, endTime: `${todayStr}T10:00:00Z`, status: BookingStatus.ONGOING, cancelledReason: null, createdAt: ago(1) },
+  { id: 'b-002', timeRange: "2026-07-14 10:00:00", resourceId: 'a-004', resource: assets[3], bookedBy: 'u-003', bookedByEmployee: allEmployees[2], startTime: `${todayStr}T10:00:00Z`, endTime: `${todayStr}T11:30:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
+  { id: 'b-003', timeRange: "2026-07-14 14:00:00", resourceId: 'a-004', resource: assets[3], bookedBy: 'u-005', bookedByEmployee: extraEmployees[0], startTime: `${todayStr}T14:00:00Z`, endTime: `${todayStr}T15:00:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
+  { id: 'b-004', timeRange: "2026-07-14 11:00:00", resourceId: 'a-005', resource: assets[4], bookedBy: 'u-004', bookedByEmployee: allEmployees[3], startTime: `${todayStr}T11:00:00Z`, endTime: `${todayStr}T12:00:00Z`, status: BookingStatus.UPCOMING, cancelledReason: null, createdAt: ago(1) },
+  { id: 'b-005', timeRange: "2026-07-14 08:00:00", resourceId: 'a-006', resource: assets[5], bookedBy: 'u-001', bookedByEmployee: allEmployees[0], startTime: `${todayStr}T08:00:00Z`, endTime: `${todayStr}T17:00:00Z`, status: BookingStatus.ONGOING, cancelledReason: null, createdAt: ago(2) },
 ];
 
 export const maintenanceRequests: MaintenanceRequest[] = [
