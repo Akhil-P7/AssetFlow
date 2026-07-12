@@ -1,4 +1,11 @@
-import { IsUUID, IsOptional, IsString, IsDateString, IsArray, IsIn } from 'class-validator';
+import {
+  IsUUID,
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsArray,
+  IsIn,
+} from 'class-validator';
 
 export class CreateAuditCycleDto {
   @IsOptional() @IsUUID() scopeDepartmentId?: string;
