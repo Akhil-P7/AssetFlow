@@ -96,38 +96,40 @@ export function AssetsPage() {
         />
       ) : (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden animate-fade-in shadow-sm">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tag</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Category</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Location</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((asset) => (
-                <tr
-                  key={asset.id}
-                  onClick={() => navigate(`/assets/${asset.id}`)}
-                  className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
-                >
-                  <td className="px-5 py-3.5">
-                    <code className="font-mono text-sm text-teal-600 dark:text-teal-400 font-medium">{asset.assetTag}</code>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{asset.name}</span>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{asset.category?.name}</td>
-                  <td className="px-5 py-3.5">
-                    <AssetStatusBadge status={asset.status} />
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{asset.location || '—'}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Tag</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Category</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden lg:table-cell">Location</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((asset) => (
+                  <tr
+                    key={asset.id}
+                    onClick={() => navigate(`/assets/${asset.id}`)}
+                    className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+                  >
+                    <td className="px-5 py-3.5">
+                      <code className="font-mono text-sm text-teal-600 dark:text-teal-400 font-medium">{asset.assetTag}</code>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{asset.name}</span>
+                    </td>
+                    <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{asset.category?.name}</td>
+                    <td className="px-5 py-3.5">
+                      <AssetStatusBadge status={asset.status} />
+                    </td>
+                    <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{asset.location || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
