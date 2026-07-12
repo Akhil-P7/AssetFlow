@@ -10,7 +10,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);
-  const frontendUrl = configService.get<string>('app.frontendUrl', 'http://localhost:5173');
+  const frontendUrl = configService.get<string>(
+    'app.frontendUrl',
+    'http://localhost:5173',
+  );
 
   // Global prefix for all routes: /api/v1
   app.setGlobalPrefix('api/v1');

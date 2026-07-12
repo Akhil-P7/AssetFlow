@@ -7,7 +7,7 @@ import { Input, Select } from '@/components/ui/Input';
 import { AssetStatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { PageLoader, EmptyState } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { Asset, AssetCategory } from '@/types';
 import { AssetStatus } from '@/types';
 
@@ -24,8 +24,8 @@ export function AssetsPage() {
   useEffect(() => {
     (async () => {
       const [assetData, catData] = await Promise.all([
-        mockApi.getAssets(),
-        mockApi.getCategories(),
+        (await apiClient.get('/assets')) as Asset[],
+        (await apiClient.get('/org/categories')) as AssetCategory[],
       ]);
       setAssets(assetData);
       setCategories(catData);
@@ -167,7 +167,7 @@ export function AssetDetailPage() {
   useEffect(() => {
     const id = window.location.pathname.split('/').pop();
     (async () => {
-      const data = await mockApi.getAssetById(id || '');
+      const data = (await apiClient.get(`/assets/${id}`)) as Asset;
       setAsset(data || null);
       setLoading(false);
     })();

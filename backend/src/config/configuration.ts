@@ -10,7 +10,8 @@ export const databaseConfig = registerAs('database', () => ({
 
 export const jwtConfig = registerAs('jwt', () => ({
   accessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret-change-me',
-  refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-me',
+  refreshSecret:
+    process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-me',
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || '15m',
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || '7d',
 }));

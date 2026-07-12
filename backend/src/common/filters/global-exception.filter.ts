@@ -51,7 +51,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         details = resp['details'] as Record<string, unknown> | undefined;
       } else {
         code = 'HTTP_ERROR';
-        message = typeof exResponse === 'string' ? exResponse : exception.message;
+        message =
+          typeof exResponse === 'string' ? exResponse : exception.message;
       }
     } else {
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;

@@ -4,7 +4,7 @@ import { Package, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuthStore } from '@/stores/auth-store';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 
 type AuthView = 'login' | 'signup' | 'forgot-password';
 
@@ -57,11 +57,14 @@ function LoginForm({ onSwitch }: { onSwitch: (v: AuthView) => void }) {
     setLoading(true);
     setError('');
     try {
-      const res = await mockApi.login(email, password);
-      authLogin(res.user, { accessToken: res.accessToken, refreshToken: res.refreshToken });
+      const data = (await apiClient.post('/auth/login', {
+        email,
+        password,
+      })) as { user: any; accessToken: string; refreshToken: string };
+      authLogin(data.user, { accessToken: data.accessToken, refreshToken: data.refreshToken });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err?.response?.data?.error?.message || 'Login failed');
+      setError(err?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -137,10 +140,10 @@ function SignupForm({ onSwitch }: { onSwitch: (v: AuthView) => void }) {
     setLoading(true);
     setError('');
     try {
-      const res = await mockApi.signup(name, email, password);
-      setSuccess(res.message);
+      const res = await apiClient.post('/auth/signup', { name, email, password });
+      setSuccess('Account created successfully');
     } catch (err: any) {
-      setError(err?.response?.data?.error?.message || 'Signup failed');
+      setError(err?.message || 'Signup failed');
     } finally {
       setLoading(false);
     }

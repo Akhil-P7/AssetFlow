@@ -16,10 +16,7 @@ export type AssetStatus =
  * Employee roles — matches the employee_role Postgres ENUM from Spec 01.
  */
 export type EmployeeRole =
-  | 'EMPLOYEE'
-  | 'DEPARTMENT_HEAD'
-  | 'ASSET_MANAGER'
-  | 'ADMIN';
+  'EMPLOYEE' | 'DEPARTMENT_HEAD' | 'ASSET_MANAGER' | 'ADMIN';
 
 /**
  * Special pseudo-roles used in transition definitions.
@@ -50,29 +47,104 @@ interface Transition {
  */
 export const ASSET_TRANSITIONS: Transition[] = [
   // Allocation flows
-  { from: 'AVAILABLE',         to: 'ALLOCATED',         triggeredBy: 'allocation.create',           allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD'] },
-  { from: 'ALLOCATED',         to: 'AVAILABLE',         triggeredBy: 'allocation.return',            allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'HOLDER'] },
+  {
+    from: 'AVAILABLE',
+    to: 'ALLOCATED',
+    triggeredBy: 'allocation.create',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD'],
+  },
+  {
+    from: 'ALLOCATED',
+    to: 'AVAILABLE',
+    triggeredBy: 'allocation.return',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'HOLDER'],
+  },
 
   // Booking flows
-  { from: 'AVAILABLE',         to: 'RESERVED',          triggeredBy: 'booking.create',               allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE'] },
-  { from: 'RESERVED',          to: 'AVAILABLE',         triggeredBy: 'booking.complete',             allowedRoles: ['SYSTEM'] },
-  { from: 'RESERVED',          to: 'AVAILABLE',         triggeredBy: 'booking.cancel',               allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'BOOKING_OWNER'] },
+  {
+    from: 'AVAILABLE',
+    to: 'RESERVED',
+    triggeredBy: 'booking.create',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'DEPARTMENT_HEAD', 'EMPLOYEE'],
+  },
+  {
+    from: 'RESERVED',
+    to: 'AVAILABLE',
+    triggeredBy: 'booking.complete',
+    allowedRoles: ['SYSTEM'],
+  },
+  {
+    from: 'RESERVED',
+    to: 'AVAILABLE',
+    triggeredBy: 'booking.cancel',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER', 'BOOKING_OWNER'],
+  },
 
   // Maintenance flows
-  { from: 'AVAILABLE',         to: 'UNDER_MAINTENANCE', triggeredBy: 'maintenance.approve',          allowedRoles: ['ASSET_MANAGER'] },
-  { from: 'ALLOCATED',         to: 'UNDER_MAINTENANCE', triggeredBy: 'maintenance.approve',          allowedRoles: ['ASSET_MANAGER'] },
-  { from: 'UNDER_MAINTENANCE', to: 'AVAILABLE',         triggeredBy: 'maintenance.resolve',          allowedRoles: ['ASSET_MANAGER'] },
+  {
+    from: 'AVAILABLE',
+    to: 'UNDER_MAINTENANCE',
+    triggeredBy: 'maintenance.approve',
+    allowedRoles: ['ASSET_MANAGER'],
+  },
+  {
+    from: 'ALLOCATED',
+    to: 'UNDER_MAINTENANCE',
+    triggeredBy: 'maintenance.approve',
+    allowedRoles: ['ASSET_MANAGER'],
+  },
+  {
+    from: 'UNDER_MAINTENANCE',
+    to: 'AVAILABLE',
+    triggeredBy: 'maintenance.resolve',
+    allowedRoles: ['ASSET_MANAGER'],
+  },
 
   // Audit flows — confirmed missing assets become LOST
-  { from: 'AVAILABLE',         to: 'LOST',              triggeredBy: 'audit.close.confirmedMissing',  allowedRoles: ['SYSTEM'] },
-  { from: 'ALLOCATED',         to: 'LOST',              triggeredBy: 'audit.close.confirmedMissing',  allowedRoles: ['SYSTEM'] },
-  { from: 'UNDER_MAINTENANCE', to: 'LOST',              triggeredBy: 'audit.close.confirmedMissing',  allowedRoles: ['SYSTEM'] },
+  {
+    from: 'AVAILABLE',
+    to: 'LOST',
+    triggeredBy: 'audit.close.confirmedMissing',
+    allowedRoles: ['SYSTEM'],
+  },
+  {
+    from: 'ALLOCATED',
+    to: 'LOST',
+    triggeredBy: 'audit.close.confirmedMissing',
+    allowedRoles: ['SYSTEM'],
+  },
+  {
+    from: 'UNDER_MAINTENANCE',
+    to: 'LOST',
+    triggeredBy: 'audit.close.confirmedMissing',
+    allowedRoles: ['SYSTEM'],
+  },
 
   // Manual overrides (Admin/Asset Manager)
-  { from: 'LOST',              to: 'AVAILABLE',         triggeredBy: 'manual.override.recovered',    allowedRoles: ['ADMIN', 'ASSET_MANAGER'] },
-  { from: 'AVAILABLE',         to: 'RETIRED',           triggeredBy: 'manual.override.retire',       allowedRoles: ['ADMIN', 'ASSET_MANAGER'] },
-  { from: 'LOST',              to: 'RETIRED',           triggeredBy: 'manual.override.retire',       allowedRoles: ['ADMIN', 'ASSET_MANAGER'] },
-  { from: 'RETIRED',           to: 'DISPOSED',          triggeredBy: 'manual.override.dispose',      allowedRoles: ['ADMIN'] },
+  {
+    from: 'LOST',
+    to: 'AVAILABLE',
+    triggeredBy: 'manual.override.recovered',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER'],
+  },
+  {
+    from: 'AVAILABLE',
+    to: 'RETIRED',
+    triggeredBy: 'manual.override.retire',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER'],
+  },
+  {
+    from: 'LOST',
+    to: 'RETIRED',
+    triggeredBy: 'manual.override.retire',
+    allowedRoles: ['ADMIN', 'ASSET_MANAGER'],
+  },
+  {
+    from: 'RETIRED',
+    to: 'DISPOSED',
+    triggeredBy: 'manual.override.dispose',
+    allowedRoles: ['ADMIN'],
+  },
 ];
 
 /**
@@ -112,10 +184,7 @@ export function assertValidTransition(
   // before invoking this function. If the actorRole is one of these pseudo-roles,
   // the calling service has already verified the actor is authorized.
   const resolvedRoles = match.allowedRoles as string[];
-  if (
-    !resolvedRoles.includes(actorRole) &&
-    !resolvedRoles.includes('SYSTEM')
-  ) {
+  if (!resolvedRoles.includes(actorRole) && !resolvedRoles.includes('SYSTEM')) {
     throw new ApiError(
       'FORBIDDEN',
       403,

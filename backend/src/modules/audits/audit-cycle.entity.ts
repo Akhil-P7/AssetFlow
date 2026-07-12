@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Department } from '../org/departments/department.entity';
 import { Employee } from '../org/employees/employee.entity';
 
@@ -10,7 +18,12 @@ export class AuditCycle {
   @Column({ name: 'scope_department_id', type: 'uuid', nullable: true })
   scopeDepartmentId?: string | null;
 
-  @Column({ name: 'scope_location', type: 'varchar', length: 160, nullable: true })
+  @Column({
+    name: 'scope_location',
+    type: 'varchar',
+    length: 160,
+    nullable: true,
+  })
   scopeLocation?: string | null;
 
   @Column({ name: 'start_date', type: 'date' })

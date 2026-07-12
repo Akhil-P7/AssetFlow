@@ -10,11 +10,18 @@ import { EmployeesService } from './employees/employees.service';
 import { EmployeesRepository } from './employees/employees.repository';
 
 @Module({
-  controllers: [DepartmentsController, CategoriesController, EmployeesController],
+  controllers: [
+    DepartmentsController,
+    CategoriesController,
+    EmployeesController,
+  ],
   providers: [
-    DepartmentsService, DepartmentsRepository,
-    CategoriesService, CategoriesRepository,
-    EmployeesService, EmployeesRepository,
+    DepartmentsService,
+    DepartmentsRepository,
+    CategoriesService,
+    CategoriesRepository,
+    EmployeesService,
+    EmployeesRepository,
   ],
   exports: [DepartmentsService, CategoriesService, EmployeesService],
 })

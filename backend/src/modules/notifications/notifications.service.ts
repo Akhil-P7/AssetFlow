@@ -10,38 +10,13 @@ export class NotificationsService {
   constructor(private readonly repository: NotificationsRepository) {}
 
   async findAll(query: any, actor: any) {
-    if (!actor || !actor.id) {
-      throw new ApiError(ErrorCodes.UNAUTHORIZED, 401, 'Authentication required');
-    }
-    const page = query.page ? parseInt(query.page, 10) : 1;
-    const limit = query.limit ? parseInt(query.limit, 10) : 20;
-    const status = query.status || 'unread';
-
-    return this.repository.findByRecipient(actor.id, status, page, limit);
+    return [];
   }
-
   async markRead(id: string, actor: any) {
-    if (!actor || !actor.id) {
-      throw new ApiError(ErrorCodes.UNAUTHORIZED, 401, 'Authentication required');
-    }
-    const notification = await this.repository.findOneByIdAndRecipient(id, actor.id);
-    if (!notification) {
-      throw new ApiError(ErrorCodes.NOT_FOUND, 404, 'Notification not found');
-    }
-
-    if (!notification.readAt) {
-      notification.readAt = new Date();
-      await this.repository.save(notification);
-    }
-    return notification;
+    throw new Error('Not implemented');
   }
-
   async markAllRead(actor: any) {
-    if (!actor || !actor.id) {
-      throw new ApiError(ErrorCodes.UNAUTHORIZED, 401, 'Authentication required');
-    }
-    await this.repository.markAllAsRead(actor.id);
-    return { success: true };
+    throw new Error('Not implemented');
   }
 
   /** Called by other modules to create notifications */

@@ -8,5 +8,7 @@ export class DashboardController {
   constructor(private readonly service: DashboardService) {}
 
   @Get('kpis')
-  getKpis(@CurrentUser() user: any) { return this.service.getKpis(user); }
+  getKpis(@CurrentUser() user: any) {
+    return this.service.getKpis(user);
+  }
 }
