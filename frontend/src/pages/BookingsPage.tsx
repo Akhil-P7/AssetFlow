@@ -6,7 +6,7 @@ import { Select, Input } from '@/components/ui/Input';
 import { BookingStatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { PageLoader, EmptyState } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { Booking, Asset } from '@/types';
 import { BookingStatus } from '@/types';
 
@@ -22,8 +22,8 @@ export function BookingsPage() {
   useEffect(() => {
     (async () => {
       const [bookingData, resourceData] = await Promise.all([
-        mockApi.getBookings(),
-        mockApi.getBookableResources(),
+        (await apiClient.get('/bookings')) as Booking[],
+        (await apiClient.get('/assets?isBookable=true')) as Asset[],
       ]);
       setBookings(bookingData);
       setResources(resourceData);
