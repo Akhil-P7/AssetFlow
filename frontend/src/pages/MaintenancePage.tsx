@@ -7,7 +7,7 @@ import { MaintenanceStatusBadge, PriorityBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Select, Textarea } from '@/components/ui/Input';
 import { PageLoader, EmptyState } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { MaintenanceRequest, Asset, Employee } from '@/types';
 
 export function MaintenancePage() {
@@ -21,9 +21,9 @@ export function MaintenancePage() {
   useEffect(() => {
     (async () => {
       const [recordData, assetData, empData] = await Promise.all([
-        mockApi.getMaintenanceRequests(),
-        mockApi.getAssets(),
-        mockApi.getEmployees(),
+        (await apiClient.get('/maintenance')) as MaintenanceRequest[],
+        (await apiClient.get('/assets')) as Asset[],
+        (await apiClient.get('/org/employees')) as Employee[],
       ]);
       setRecords(recordData);
       setAssets(assetData);
