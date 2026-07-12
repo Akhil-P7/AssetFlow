@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Package, Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input, Select } from '@/components/ui/Input';
@@ -13,27 +14,28 @@ import { AssetStatus } from '@/types';
 
 export function AssetsPage() {
   const navigate = useNavigate();
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [categories, setCategories] = useState<AssetCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [registerOpen, setRegisterOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const [assetData, catData] = await Promise.all([
-        (await apiClient.get('/assets')) as Asset[],
-        (await apiClient.get('/org/categories')) as AssetCategory[],
-      ]);
-      setAssets(assetData);
-      setCategories(catData);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: assets = [], isLoading: assetsLoading } = useQuery<Asset[]>({
+    queryKey: ['assets'],
+    queryFn: async () => {
+      const data = await apiClient.get('/assets');
+      return data as Asset[];
+    },
+  });
 
-  if (loading) return <PageLoader />;
+  const { data: categories = [], isLoading: catsLoading } = useQuery<AssetCategory[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const data = await apiClient.get('/org/categories');
+      return data as AssetCategory[];
+    },
+  });
+
+  if (assetsLoading || catsLoading) return <PageLoader />;
 
   const filtered = assets.filter((a) => {
     if (search) {
@@ -161,17 +163,14 @@ export function AssetsPage() {
 }
 
 export function AssetDetailPage() {
-  const [asset, setAsset] = useState<Asset | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const id = window.location.pathname.split('/').pop();
-    (async () => {
-      const data = (await apiClient.get(`/assets/${id}`)) as Asset;
-      setAsset(data || null);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: asset, isLoading: loading } = useQuery<Asset>({
+    queryKey: ['asset', window.location.pathname.split('/').pop()],
+    queryFn: async () => {
+      const id = window.location.pathname.split('/').pop();
+      const data = await apiClient.get(`/assets/${id}`);
+      return data as Asset;
+    },
+  });
 
   if (loading) return <PageLoader />;
   if (!asset) return <EmptyState title="Asset not found" description="This asset doesn't exist or has been removed." />;

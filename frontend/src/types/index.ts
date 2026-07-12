@@ -159,15 +159,19 @@ export interface TransferRequest {
 
 export interface Booking {
   id: string;
-  resourceAssetId: string;
+  resourceId: string;
+  resourceAssetId?: string; // alias for backward compat
   resource?: Asset;
   bookedBy: string;
   bookedByEmployee?: Employee;
-  startTime: string;
-  endTime: string;
+  bookedForDepartmentId?: string | null;
+  timeRange: string; // PostgreSQL tstzrange string
+  startTime?: string;
+  endTime?: string;
   status: BookingStatus;
   cancelledReason: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface MaintenanceRequest {

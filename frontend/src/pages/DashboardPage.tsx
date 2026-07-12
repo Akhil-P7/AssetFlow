@@ -1,37 +1,38 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Package, Users, Wrench, Calendar, ArrowLeftRight,
   Clock, AlertTriangle, Plus, Activity,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { KPICard } from '@/components/ui/KPICard';
 import { Button } from '@/components/ui/Button';
 import { PageLoader } from '@/components/ui/LoadingSpinner';
 import { useAuthStore } from '@/stores/auth-store';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { DashboardKPIs, ActivityLogEntry } from '@/types';
 
 export function DashboardPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [kpis, setKpis] = useState<DashboardKPIs | null>(null);
-  const [recentActivity, setRecentActivity] = useState<ActivityLogEntry[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const [kpiData, activityData] = await Promise.all([
-        mockApi.getDashboardKPIs(),
-        mockApi.getActivityLog(),
-      ]);
-      setKpis(kpiData);
-      setRecentActivity(activityData.slice(0, 6));
-      setLoading(false);
-    })();
-  }, []);
+  const { data: kpis, isLoading: kpisLoading } = useQuery<DashboardKPIs>({
+    queryKey: ['dashboard', 'kpis'],
+    queryFn: async () => {
+      const data = await apiClient.get('/dashboard/kpis');
+      return data as DashboardKPIs;
+    },
+  });
 
-  if (loading || !kpis) return <PageLoader />;
+  const { data: recentActivity = [], isLoading: activityLoading } = useQuery<ActivityLogEntry[]>({
+    queryKey: ['activity-log'],
+    queryFn: async () => {
+      const res: any = await apiClient.get('/activity-log?limit=6');
+      return (res.data || res) as ActivityLogEntry[];
+    },
+  });
+
+  if (kpisLoading || activityLoading || !kpis) return <PageLoader />;
 
   const overduePercent = kpis.totalAssets > 0
     ? Math.round((kpis.overdueReturns / Math.max(kpis.upcomingReturns + kpis.overdueReturns, 1)) * 100)

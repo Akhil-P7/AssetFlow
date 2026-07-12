@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Plus, Building2, Tag, Users, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Building2, Users, FolderTree, Plus, Settings, Tag, Shield } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TabBar } from '@/components/ui/TabBar';
 import { Button } from '@/components/ui/Button';
@@ -7,34 +8,31 @@ import { EntityStatusBadge, RoleBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Select } from '@/components/ui/Input';
 import { PageLoader } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { Department, AssetCategory, Employee } from '@/types';
 import { Role } from '@/types';
 
 export function OrgSetupPage() {
   const [activeTab, setActiveTab] = useState('departments');
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [categories, setCategories] = useState<AssetCategory[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [promoteModal, setPromoteModal] = useState<Employee | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const [depts, cats, emps] = await Promise.all([
-        mockApi.getDepartments(),
-        mockApi.getCategories(),
-        mockApi.getEmployees(),
-      ]);
-      setDepartments(depts);
-      setCategories(cats);
-      setEmployees(emps);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: departments = [], isLoading: depsLoading } = useQuery<Department[]>({
+    queryKey: ['departments'],
+    queryFn: async () => (await apiClient.get('/org/departments')) as Department[],
+  });
 
-  if (loading) return <PageLoader />;
+  const { data: categories = [], isLoading: catsLoading } = useQuery<AssetCategory[]>({
+    queryKey: ['categories'],
+    queryFn: async () => (await apiClient.get('/org/categories')) as AssetCategory[],
+  });
+
+  const { data: employees = [], isLoading: empLoading } = useQuery<Employee[]>({
+    queryKey: ['employees'],
+    queryFn: async () => (await apiClient.get('/org/employees')) as Employee[],
+  });
+
+  if (depsLoading || catsLoading || empLoading) return <PageLoader />;
 
   const tabs = [
     { key: 'departments', label: 'Departments', count: departments.length },

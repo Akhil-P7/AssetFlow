@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Plus, Calendar as CalIcon, Clock, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Select, Input } from '@/components/ui/Input';
@@ -12,30 +13,39 @@ import { BookingStatus } from '@/types';
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8); // 08:00 to 17:00
 
+/** Parse PostgreSQL tstzrange string like '["2026-07-13 04:30:00+00","2026-07-13 05:30:00+00")' */
+function parseTimeRange(range: string): { start: Date; end: Date } {
+  const cleaned = range.replace(/[\[\]()]/g, '').replace(/"/g, '');
+  const [startStr, endStr] = cleaned.split(',').map(s => s.trim());
+  return { start: new Date(startStr), end: new Date(endStr) };
+}
+
 export function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [resources, setResources] = useState<Asset[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedResource, setSelectedResource] = useState('');
   const [bookModalOpen, setBookModalOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const [bookingData, resourceData] = await Promise.all([
-        (await apiClient.get('/bookings')) as Booking[],
-        (await apiClient.get('/assets?isBookable=true')) as Asset[],
-      ]);
-      setBookings(bookingData);
-      setResources(resourceData);
-      if (resourceData.length > 0) setSelectedResource(resourceData[0].id);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: bookings = [], isLoading: bookingsLoading } = useQuery<Booking[]>({
+    queryKey: ['bookings'],
+    queryFn: async () => (await apiClient.get('/bookings')) as Booking[],
+  });
 
-  if (loading) return <PageLoader />;
+  const { data: resources = [], isLoading: resourcesLoading } = useQuery<Asset[]>({
+    queryKey: ['bookable-assets'],
+    queryFn: async () => {
+      const data = await apiClient.get('/assets?isBookable=true');
+      return data as Asset[];
+    },
+  });
+
+  if (bookingsLoading || resourcesLoading) return <PageLoader />;
+
+  // Auto-select first resource if none selected
+  if (!selectedResource && resources.length > 0) {
+    setSelectedResource(resources[0].id);
+  }
 
   const resourceBookings = bookings.filter(b =>
-    b.resourceAssetId === selectedResource &&
+    b.resourceId === selectedResource &&
     (b.status === BookingStatus.UPCOMING || b.status === BookingStatus.ONGOING)
   );
 
@@ -80,12 +90,16 @@ export function BookingsPage() {
         <div className="space-y-0">
           {HOURS.map((hour) => {
             const booking = resourceBookings.find(b => {
-              const startHour = new Date(b.startTime).getUTCHours();
-              const endHour = new Date(b.endTime).getUTCHours();
+              const { start, end } = parseTimeRange(b.timeRange);
+              const startHour = start.getUTCHours();
+              const endHour = end.getUTCHours();
               return hour >= startHour && hour < endHour;
             });
 
-            const isStart = booking && new Date(booking.startTime).getUTCHours() === hour;
+            const isStart = booking && (() => {
+              const { start } = parseTimeRange(booking.timeRange);
+              return start.getUTCHours() === hour;
+            })();
 
             return (
               <div key={hour} className="flex group">
@@ -98,7 +112,9 @@ export function BookingsPage() {
                   transition-colors
                   ${booking ? '' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer'}
                 `}>
-                  {isStart && booking && (
+                  {isStart && booking && (() => {
+                    const { start, end } = parseTimeRange(booking.timeRange);
+                    return (
                     <div className={`
                       p-3 rounded-md border-l-4
                       ${booking.status === BookingStatus.ONGOING
@@ -110,19 +126,20 @@ export function BookingsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                            {booking.bookedByEmployee?.name}
+                            {booking.bookedByEmployee?.name || 'Booked'}
                           </p>
                           <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
                             <Clock className="w-3 h-3" />
-                            {new Date(booking.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
+                            {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
                             {' — '}
-                            {new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
+                            {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })}
                           </p>
                         </div>
                         <BookingStatusBadge status={booking.status} />
                       </div>
                     </div>
-                  )}
+                    );
+                  })()}
                   {!booking && (
                     <div className="text-xs text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
                       Click to book this slot

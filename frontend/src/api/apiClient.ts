@@ -47,4 +47,14 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+// Export a wrapper that tells TypeScript the response is already unwrapped
+// This fixes TS2352 errors where TS thinks it returns AxiosResponse<T>
+const api = {
+  get: <T = any>(url: string, config?: any) => apiClient.get<any, T>(url, config),
+  post: <T = any>(url: string, data?: any, config?: any) => apiClient.post<any, T>(url, data, config),
+  patch: <T = any>(url: string, data?: any, config?: any) => apiClient.patch<any, T>(url, data, config),
+  put: <T = any>(url: string, data?: any, config?: any) => apiClient.put<any, T>(url, data, config),
+  delete: <T = any>(url: string, config?: any) => apiClient.delete<any, T>(url, config),
+};
+
+export default api;

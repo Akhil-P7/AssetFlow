@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeftRight, ArrowRight, AlertTriangle, Search, Clock, Check, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input, Select, Textarea } from '@/components/ui/Input';
@@ -12,31 +13,30 @@ import { AllocationStatus, AssetStatus } from '@/types';
 
 export function AllocationsPage() {
   const [activeTab, setActiveTab] = useState('allocate');
-  const [allocations, setAllocations] = useState<Allocation[]>([]);
-  const [transfers, setTransfers] = useState<TransferRequest[]>([]);
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedAssetId, setSelectedAssetId] = useState('');
   const [showConflict, setShowConflict] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const [allocs, trans, assetData, empData] = await Promise.all([
-        (await apiClient.get('/allocations')) as Allocation[],
-        (await apiClient.get('/allocations/transfers')) as TransferRequest[],
-        (await apiClient.get('/assets')) as Asset[],
-        (await apiClient.get('/org/employees')) as Employee[],
-      ]);
-      setAllocations(allocs);
-      setTransfers(trans);
-      setAssets(assetData);
-      setEmployees(empData);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: allocations = [], isLoading: allocLoading } = useQuery<Allocation[]>({
+    queryKey: ['allocations'],
+    queryFn: async () => (await apiClient.get('/allocations')) as Allocation[],
+  });
 
-  if (loading) return <PageLoader />;
+  const { data: transfers = [], isLoading: transferLoading } = useQuery<TransferRequest[]>({
+    queryKey: ['transfers'],
+    queryFn: async () => (await apiClient.get('/transfers')) as TransferRequest[],
+  });
+
+  const { data: assets = [], isLoading: assetsLoading } = useQuery<Asset[]>({
+    queryKey: ['assets'],
+    queryFn: async () => (await apiClient.get('/assets')) as Asset[],
+  });
+
+  const { data: employees = [], isLoading: employeesLoading } = useQuery<Employee[]>({
+    queryKey: ['employees'],
+    queryFn: async () => (await apiClient.get('/org/employees')) as Employee[],
+  });
+
+  if (allocLoading || transferLoading || assetsLoading || employeesLoading) return <PageLoader />;
 
   const selectedAsset = assets.find(a => a.id === selectedAssetId);
   const activeAllocation = selectedAsset ? allocations.find(a => a.assetId === selectedAssetId && a.status === AllocationStatus.ACTIVE) : null;

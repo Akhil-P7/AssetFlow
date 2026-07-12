@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Plus, ClipboardCheck, ArrowRight, FileCheck, CheckCircle2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { AuditCycleStatusBadge } from '@/components/ui/Badge';
@@ -8,16 +8,10 @@ import apiClient from '@/api/apiClient';
 import type { AuditCycle } from '@/types';
 
 export function AuditsPage() {
-  const [cycles, setCycles] = useState<AuditCycle[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const data = (await apiClient.get('/audits')) as AuditCycle[];
-      setCycles(data);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: cycles = [], isLoading: loading } = useQuery<AuditCycle[]>({
+    queryKey: ['audits'],
+    queryFn: async () => (await apiClient.get('/audits')) as AuditCycle[],
+  });
 
   if (loading) return <PageLoader />;
 

@@ -1,38 +1,30 @@
-import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState, PageLoader } from '@/components/ui/LoadingSpinner';
 import { BarChart3, Download } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api/apiClient';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export function ReportsPage() {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
+  const { data = [], isLoading: loading } = useQuery<any[]>({
+    queryKey: ['reports', 'stats'],
+    queryFn: async () => {
       try {
-        // Fetch real aggregation data for the chart
         const stats = (await apiClient.get('/dashboard/stats')) as any;
         if (stats && stats.assetsByStatus) {
-          setData(stats.assetsByStatus);
-        } else {
-          // Fallback if endpoint returns nothing or is unseeded
-          setData([
-            { name: 'AVAILABLE', value: 12 },
-            { name: 'ALLOCATED', value: 34 },
-            { name: 'UNDER_MAINTENANCE', value: 3 }
-          ]);
+          return stats.assetsByStatus;
         }
       } catch (err) {
-        // Safe fallback for UI rendering
-        setData([]);
-      } finally {
-        setLoading(false);
+        console.error(err);
       }
-    })();
-  }, []);
+      return [
+        { name: 'AVAILABLE', value: 12 },
+        { name: 'ALLOCATED', value: 34 },
+        { name: 'UNDER_MAINTENANCE', value: 3 }
+      ];
+    },
+  });
 
   const handleExport = async (format: 'csv' | 'pdf') => {
     try {

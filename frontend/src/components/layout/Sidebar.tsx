@@ -150,7 +150,7 @@ export function Sidebar() {
 
       {user && (
         <div className="px-3 py-3 border-t border-slate-200 dark:border-slate-800">
-          <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
+          <div className={`flex ${sidebarCollapsed ? 'flex-col items-center justify-center gap-2' : 'items-center gap-3'}`}>
             <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-300 text-sm font-semibold shrink-0">
               {user.name.split(' ').map(n => n[0]).join('')}
             </div>
@@ -160,15 +160,13 @@ export function Sidebar() {
                 <RoleBadge role={user.role} />
               </div>
             )}
-            {!sidebarCollapsed && (
-              <button
-                onClick={logout}
-                className="p-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            )}
+            <button
+              onClick={logout}
+              className="p-1.5 rounded-md text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition-colors cursor-pointer"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

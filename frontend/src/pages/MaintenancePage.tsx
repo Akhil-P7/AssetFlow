@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Plus, Wrench, AlertCircle, FileText, Settings, FileSearch, ArrowRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TabBar } from '@/components/ui/TabBar';
 import { Button } from '@/components/ui/Button';
@@ -12,27 +13,24 @@ import type { MaintenanceRequest, Asset, Employee } from '@/types';
 
 export function MaintenancePage() {
   const [activeTab, setActiveTab] = useState('active');
-  const [records, setRecords] = useState<MaintenanceRequest[]>([]);
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const [recordData, assetData, empData] = await Promise.all([
-        (await apiClient.get('/maintenance')) as MaintenanceRequest[],
-        (await apiClient.get('/assets')) as Asset[],
-        (await apiClient.get('/org/employees')) as Employee[],
-      ]);
-      setRecords(recordData);
-      setAssets(assetData);
-      setEmployees(empData);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: records = [], isLoading: recordsLoading } = useQuery<MaintenanceRequest[]>({
+    queryKey: ['maintenance'],
+    queryFn: async () => (await apiClient.get('/maintenance')) as MaintenanceRequest[],
+  });
 
-  if (loading) return <PageLoader />;
+  const { data: assets = [], isLoading: assetsLoading } = useQuery<Asset[]>({
+    queryKey: ['assets'],
+    queryFn: async () => (await apiClient.get('/assets')) as Asset[],
+  });
+
+  const { data: employees = [], isLoading: employeesLoading } = useQuery<Employee[]>({
+    queryKey: ['employees'],
+    queryFn: async () => (await apiClient.get('/org/employees')) as Employee[],
+  });
+
+  if (recordsLoading || assetsLoading || employeesLoading) return <PageLoader />;
 
   const tabs = [
     { key: 'active', label: 'Active Requests', count: records.filter(r => r.status !== 'RESOLVED' && r.status !== 'REJECTED').length },
