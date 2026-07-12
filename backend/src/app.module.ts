@@ -38,7 +38,7 @@ import { CronModule } from './modules/cron/cron.module';
         username: config.get('database.username'),
         password: config.get('database.password'),
         database: config.get('database.database'),
-        autoLoadEntities: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false, // NEVER true in production — use migrations
         logging: config.get('app.nodeEnv') === 'development',
       }),
