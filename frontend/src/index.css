@@ -19,6 +19,13 @@ body {
   line-height: 1.6;
 }
 
+/* Smooth theme transitions */
+body, aside, main, header, nav, a, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6, table, tr, th, td {
+  transition-property: background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 #root {
   min-height: 100vh;
 }

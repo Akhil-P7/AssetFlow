@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NotificationsRepository } from './notifications.repository';
+import { ApiError, ErrorCodes } from '../../common/exceptions/api-error.exception';
+import { NotificationType } from './notification.entity';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class NotificationsService {
@@ -17,7 +20,8 @@ export class NotificationsService {
   }
 
   /** Called by other modules to create notifications */
-  async create(recipientId: string, type: string, payload: any, tx?: any) {
-    throw new Error('Not implemented');
+  async create(recipientId: string, type: NotificationType, payload: Record<string, any>, tx?: EntityManager) {
+    this.logger.log(`Creating notification of type ${type} for recipient ${recipientId}`);
+    return this.repository.createNotification(recipientId, type, payload, tx);
   }
 }

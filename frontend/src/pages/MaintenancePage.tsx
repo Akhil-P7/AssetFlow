@@ -59,43 +59,45 @@ export function MaintenancePage() {
           {records.length === 0 ? (
             <EmptyState title="No active maintenance requests" icon={<Wrench className="w-8 h-8 text-slate-400" />} />
           ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Asset</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Issue Description</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Priority</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Technician</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {records.filter(r => r.status !== 'RESOLVED' && r.status !== 'REJECTED').map((record) => (
-                  <tr key={record.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <div className="flex flex-col">
-                        <code className="font-mono text-xs text-teal-600 dark:text-teal-400">{record.asset?.assetTag}</code>
-                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{record.asset?.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <p className="text-sm text-slate-700 dark:text-slate-300 max-w-xs truncate" title={record.issueDescription}>
-                        {record.issueDescription}
-                      </p>
-                    </td>
-                    <td className="px-5 py-3.5"><PriorityBadge priority={record.priority} /></td>
-                    <td className="px-5 py-3.5"><MaintenanceStatusBadge status={record.status} /></td>
-                    <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
-                      {record.technicianName || 'Unassigned'}
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <Button variant="ghost" size="sm" icon={<Settings className="w-4 h-4" />}>Update</Button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Asset</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Issue Description</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Priority</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Technician</th>
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {records.filter(r => r.status !== 'RESOLVED' && r.status !== 'REJECTED').map((record) => (
+                    <tr key={record.id} className="border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <div className="flex flex-col">
+                          <code className="font-mono text-xs text-teal-600 dark:text-teal-400">{record.asset?.assetTag}</code>
+                          <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{record.asset?.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <p className="text-sm text-slate-700 dark:text-slate-300 max-w-xs truncate" title={record.issueDescription}>
+                          {record.issueDescription}
+                        </p>
+                      </td>
+                      <td className="px-5 py-3.5"><PriorityBadge priority={record.priority} /></td>
+                      <td className="px-5 py-3.5"><MaintenanceStatusBadge status={record.status} /></td>
+                      <td className="px-5 py-3.5 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
+                        {record.technicianName || 'Unassigned'}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <Button variant="ghost" size="sm" icon={<Settings className="w-4 h-4" />}>Update</Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
