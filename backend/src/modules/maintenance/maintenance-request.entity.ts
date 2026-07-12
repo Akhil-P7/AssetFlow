@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Asset } from '../assets/asset.entity';
 import { Employee } from '../org/employees/employee.entity';
 
@@ -28,7 +36,12 @@ export class MaintenanceRequest {
   @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy?: string | null;
 
-  @Column({ name: 'technician_name', type: 'varchar', length: 120, nullable: true })
+  @Column({
+    name: 'technician_name',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
   technicianName?: string | null;
 
   @Column({ name: 'resolved_at', type: 'timestamptz', nullable: true })

@@ -1,4 +1,10 @@
-import { IsUUID, IsString, IsNotEmpty, IsOptional, IsIn } from 'class-validator';
+import {
+  IsUUID,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
 
 export class CreateMaintenanceDto {
   @IsUUID() assetId!: string;

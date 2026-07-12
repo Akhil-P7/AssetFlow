@@ -8,15 +8,21 @@ export class MaintenanceController {
   constructor(private readonly service: MaintenanceService) {}
 
   @Get()
-  findAll(@Query() query: any) { return this.service.findAll(query); }
+  findAll(@Query() query: any) {
+    return this.service.findAll(query);
+  }
 
   @Post()
-  create(@Body() dto: any, @CurrentUser() user: any) { return this.service.create(dto, user); }
+  create(@Body() dto: any, @CurrentUser() user: any) {
+    return this.service.create(dto, user);
+  }
 
   @Post(':id/approve')
   @Roles('ASSET_MANAGER')
   @RefetchRole()
-  approve(@Param('id') id: string, @CurrentUser() user: any) { return this.service.approve(id, user); }
+  approve(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.service.approve(id, user);
+  }
 
   @Post(':id/reject')
   @Roles('ASSET_MANAGER')
@@ -32,10 +38,14 @@ export class MaintenanceController {
 
   @Post(':id/start')
   @Roles('ASSET_MANAGER')
-  start(@Param('id') id: string) { return this.service.start(id); }
+  start(@Param('id') id: string) {
+    return this.service.start(id);
+  }
 
   @Post(':id/resolve')
   @Roles('ASSET_MANAGER')
   @RefetchRole()
-  resolve(@Param('id') id: string, @CurrentUser() user: any) { return this.service.resolve(id, user); }
+  resolve(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.service.resolve(id, user);
+  }
 }
