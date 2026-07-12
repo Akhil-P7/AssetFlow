@@ -19,12 +19,20 @@ export class AuthRepository {
     return null;
   }
 
-  async createEmployee(data: { name: string; email: string; passwordHash: string }) {
+  async createEmployee(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }) {
     // TODO: Implement — role is always 'EMPLOYEE', never passed as parameter
     return null;
   }
 
-  async storeRefreshToken(employeeId: string, tokenHash: string, expiresAt: Date) {
+  async storeRefreshToken(
+    employeeId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ) {
     // TODO: Implement
   }
 

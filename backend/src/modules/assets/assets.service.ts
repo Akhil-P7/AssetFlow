@@ -16,12 +16,24 @@ export class AssetsService {
   private readonly logger = new Logger(AssetsService.name);
   constructor(private readonly repository: AssetsRepository) {}
 
-  async findAll(query: any) { /* TODO */ return []; }
-  async findOne(id: string) { /* TODO */ return null; }
-  async getHistory(id: string) { /* TODO */ return []; }
-  async findByTag(tag: string) { /* TODO */ return null; }
-  async create(dto: any, actor: any) { /* TODO: Auto-generate asset_tag, QR code */ return null; }
-  async update(id: string, dto: any) { /* TODO: Status intentionally excluded */ return null; }
+  async findAll(query: any) {
+    /* TODO */ return [];
+  }
+  async findOne(id: string) {
+    /* TODO */ return null;
+  }
+  async getHistory(id: string) {
+    /* TODO */ return [];
+  }
+  async findByTag(tag: string) {
+    /* TODO */ return null;
+  }
+  async create(dto: any, actor: any) {
+    /* TODO: Auto-generate asset_tag, QR code */ return null;
+  }
+  async update(id: string, dto: any) {
+    /* TODO: Status intentionally excluded */ return null;
+  }
 
   /**
    * The ONLY function allowed to update asset.status.

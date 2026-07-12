@@ -1,4 +1,10 @@
-import { IsUUID, IsOptional, IsDateString, IsString, IsNotEmpty } from 'class-validator';
+import {
+  IsUUID,
+  IsOptional,
+  IsDateString,
+  IsString,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class CreateAllocationDto {
   @IsUUID() assetId!: string;

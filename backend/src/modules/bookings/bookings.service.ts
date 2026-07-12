@@ -10,9 +10,19 @@ export class BookingsService {
   private readonly logger = new Logger(BookingsService.name);
   constructor(private readonly repository: BookingsRepository) {}
 
-  async findAll(query: any) { return []; }
-  async getCalendar(assetId: string, query: any) { return []; }
-  async create(dto: any, actor: any) { throw new Error('Not implemented'); }
-  async cancel(id: string, dto: any, actor: any) { throw new Error('Not implemented'); }
-  async reschedule(id: string, dto: any, actor: any) { throw new Error('Not implemented'); }
+  async findAll(query: any) {
+    return [];
+  }
+  async getCalendar(assetId: string, query: any) {
+    return [];
+  }
+  async create(dto: any, actor: any) {
+    throw new Error('Not implemented');
+  }
+  async cancel(id: string, dto: any, actor: any) {
+    throw new Error('Not implemented');
+  }
+  async reschedule(id: string, dto: any, actor: any) {
+    throw new Error('Not implemented');
+  }
 }

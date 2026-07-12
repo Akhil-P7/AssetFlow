@@ -11,10 +11,19 @@ export class ActivityLogService {
   private readonly logger = new Logger(ActivityLogService.name);
   constructor(private readonly repository: ActivityLogRepository) {}
 
-  async findAll(query: any, actor: any) { return []; }
+  async findAll(query: any, actor: any) {
+    return [];
+  }
 
   /** Called by all modules to log state-changing actions */
-  async log(actorId: string | null, action: string, entityType: string, entityId: string, metadata: any, tx?: any) {
+  async log(
+    actorId: string | null,
+    action: string,
+    entityType: string,
+    entityId: string,
+    metadata: any,
+    tx?: any,
+  ) {
     throw new Error('Not implemented');
   }
 }

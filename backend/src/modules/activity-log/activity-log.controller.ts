@@ -8,5 +8,7 @@ export class ActivityLogController {
   constructor(private readonly service: ActivityLogService) {}
 
   @Get()
-  findAll(@Query() query: any, @CurrentUser() user: any) { return this.service.findAll(query, user); }
+  findAll(@Query() query: any, @CurrentUser() user: any) {
+    return this.service.findAll(query, user);
+  }
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Patch, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { Roles, RefetchRole } from '../../../common/decorators';
 
@@ -8,14 +17,20 @@ export class EmployeesController {
   constructor(private readonly service: EmployeesService) {}
 
   @Get()
-  findAll(@Query() query: any) { return this.service.findAll(query); }
+  findAll(@Query() query: any) {
+    return this.service.findAll(query);
+  }
 
   @Get(':id')
-  findOne(@Param('id') id: string) { return this.service.findOne(id); }
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(id);
+  }
 
   @Patch(':id')
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body() dto: any) { return this.service.update(id, dto); }
+  update(@Param('id') id: string, @Body() dto: any) {
+    return this.service.update(id, dto);
+  }
 
   /**
    * POST /org/employees/:id/promote
@@ -25,5 +40,7 @@ export class EmployeesController {
   @Post(':id/promote')
   @Roles('ADMIN')
   @RefetchRole()
-  promote(@Param('id') id: string, @Body() dto: any) { return this.service.promote(id, dto); }
+  promote(@Param('id') id: string, @Body() dto: any) {
+    return this.service.promote(id, dto);
+  }
 }

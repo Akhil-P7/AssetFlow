@@ -1,6 +1,20 @@
-import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, RefreshTokenDto } from './auth.dto';
+import {
+  SignupDto,
+  LoginDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  RefreshTokenDto,
+} from './auth.dto';
 import { CurrentUser } from '../../common/decorators';
 
 /**

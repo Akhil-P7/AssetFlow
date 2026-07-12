@@ -47,10 +47,12 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ScheduleModule.forRoot(),
 
     // Rate limiting
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
 
     // Feature modules
     AuthModule,

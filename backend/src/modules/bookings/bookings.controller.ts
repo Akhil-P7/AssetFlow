@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Param, Body, Query, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CurrentUser } from '../../common/decorators';
 
@@ -8,7 +16,9 @@ export class BookingsController {
   constructor(private readonly service: BookingsService) {}
 
   @Get()
-  findAll(@Query() query: any) { return this.service.findAll(query); }
+  findAll(@Query() query: any) {
+    return this.service.findAll(query);
+  }
 
   @Get('resource/:assetId/calendar')
   getCalendar(@Param('assetId') assetId: string, @Query() query: any) {
@@ -16,7 +26,9 @@ export class BookingsController {
   }
 
   @Post()
-  create(@Body() dto: any, @CurrentUser() user: any) { return this.service.create(dto, user); }
+  create(@Body() dto: any, @CurrentUser() user: any) {
+    return this.service.create(dto, user);
+  }
 
   @Post(':id/cancel')
   cancel(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
@@ -24,7 +36,11 @@ export class BookingsController {
   }
 
   @Patch(':id/reschedule')
-  reschedule(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
+  reschedule(
+    @Param('id') id: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.service.reschedule(id, dto, user);
   }
 }

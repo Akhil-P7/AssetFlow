@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { AssetCategory } from '../org/categories/category.entity';
 import { Department } from '../org/departments/department.entity';
 
@@ -16,13 +24,25 @@ export class Asset {
   @Column({ name: 'category_id', type: 'uuid' })
   categoryId!: string;
 
-  @Column({ name: 'serial_number', type: 'varchar', length: 120, unique: true, nullable: true })
+  @Column({
+    name: 'serial_number',
+    type: 'varchar',
+    length: 120,
+    unique: true,
+    nullable: true,
+  })
   serialNumber?: string | null;
 
   @Column({ name: 'acquisition_date', type: 'date', nullable: true })
   acquisitionDate?: string | null;
 
-  @Column({ name: 'acquisition_cost', type: 'numeric', precision: 12, scale: 2, nullable: true })
+  @Column({
+    name: 'acquisition_cost',
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+  })
   acquisitionCost?: number | null;
 
   @Column({ type: 'varchar', length: 40, default: 'Good' })

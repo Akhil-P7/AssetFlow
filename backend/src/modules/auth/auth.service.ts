@@ -1,6 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
-import { SignupDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, RefreshTokenDto } from './auth.dto';
+import {
+  SignupDto,
+  LoginDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  RefreshTokenDto,
+} from './auth.dto';
 
 /**
  * Auth service — business logic for authentication workflows.
