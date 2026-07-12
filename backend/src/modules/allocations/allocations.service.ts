@@ -4,7 +4,12 @@ import { DataSource } from 'typeorm';
 import { Allocation } from './allocation.entity';
 import { TransferRequest } from './transfer-request.entity';
 import { AssetsService } from '../assets/assets.service';
-import { CreateAllocationDto, ReturnAssetDto, CreateTransferDto, RejectTransferDto } from './allocations.dto';
+import {
+  CreateAllocationDto,
+  ReturnAssetDto,
+  CreateTransferDto,
+  RejectTransferDto,
+} from './allocations.dto';
 import { ApiError } from '../../common/exceptions/api-error.exception';
 
 /**
@@ -33,7 +38,8 @@ export class AllocationsService {
 
     try {
       // 1. Lock the asset to prevent concurrent allocations
-      const activeAllocation = await queryRunner.manager.getRepository(Allocation)
+      const activeAllocation = await queryRunner.manager
+        .getRepository(Allocation)
         .createQueryBuilder('alloc')
         .where('alloc.asset_id = :assetId', { assetId: dto.assetId })
         .andWhere('alloc.status = :status', { status: 'ACTIVE' })
@@ -41,11 +47,22 @@ export class AllocationsService {
         .getOne();
 
       if (activeAllocation) {
-        throw new ApiError('ALLOCATION_CONFLICT', 409, 'Asset is already allocated');
+        throw new ApiError(
+          'ALLOCATION_CONFLICT',
+          409,
+          'Asset is already allocated',
+        );
       }
 
       // 2. Transition asset status to ALLOCATED via AssetsService
-      await this.assetsService.transitionStatus(dto.assetId, 'ALLOCATED', 'allocation.create', actor.role, undefined, queryRunner);
+      await this.assetsService.transitionStatus(
+        dto.assetId,
+        'ALLOCATED',
+        'allocation.create',
+        actor.role,
+        undefined,
+        queryRunner,
+      );
 
       // 3. Create allocation record
       const allocation = queryRunner.manager.getRepository(Allocation).create({
@@ -75,8 +92,11 @@ export class AllocationsService {
     await queryRunner.startTransaction();
 
     try {
-      const allocation = await queryRunner.manager.getRepository(Allocation).findOne({ where: { id, status: 'ACTIVE' } });
-      if (!allocation) throw new ApiError('NOT_FOUND', 404, 'Active allocation not found');
+      const allocation = await queryRunner.manager
+        .getRepository(Allocation)
+        .findOne({ where: { id, status: 'ACTIVE' } });
+      if (!allocation)
+        throw new ApiError('NOT_FOUND', 404, 'Active allocation not found');
 
       let resolvedActorRole = actor.role;
       // Allow Holder to return
@@ -85,7 +105,14 @@ export class AllocationsService {
       }
 
       // 1. Transition asset status back to AVAILABLE
-      await this.assetsService.transitionStatus(allocation.assetId, 'AVAILABLE', 'allocation.return', resolvedActorRole, dto.conditionNote, queryRunner);
+      await this.assetsService.transitionStatus(
+        allocation.assetId,
+        'AVAILABLE',
+        'allocation.return',
+        resolvedActorRole,
+        dto.conditionNote,
+        queryRunner,
+      );
 
       // 2. Close allocation
       allocation.status = 'CLOSED';
@@ -108,8 +135,11 @@ export class AllocationsService {
   }
 
   async requestTransfer(dto: CreateTransferDto, actor: any) {
-    const allocation = await this.dataSource.getRepository(Allocation).findOne({ where: { id: dto.allocationId, status: 'ACTIVE' } });
-    if (!allocation) throw new ApiError('NOT_FOUND', 404, 'Active allocation not found');
+    const allocation = await this.dataSource
+      .getRepository(Allocation)
+      .findOne({ where: { id: dto.allocationId, status: 'ACTIVE' } });
+    if (!allocation)
+      throw new ApiError('NOT_FOUND', 404, 'Active allocation not found');
 
     const transfer = this.dataSource.getRepository(TransferRequest).create({
       allocationId: dto.allocationId,
@@ -129,17 +159,29 @@ export class AllocationsService {
     await queryRunner.startTransaction();
 
     try {
-      const transfer = await queryRunner.manager.getRepository(TransferRequest).findOne({ where: { id, status: 'REQUESTED' } });
-      if (!transfer) throw new ApiError('NOT_FOUND', 404, 'Pending transfer request not found');
+      const transfer = await queryRunner.manager
+        .getRepository(TransferRequest)
+        .findOne({ where: { id, status: 'REQUESTED' } });
+      if (!transfer)
+        throw new ApiError(
+          'NOT_FOUND',
+          404,
+          'Pending transfer request not found',
+        );
 
-      const oldAllocation = await queryRunner.manager.getRepository(Allocation)
+      const oldAllocation = await queryRunner.manager
+        .getRepository(Allocation)
         .createQueryBuilder('alloc')
         .where('alloc.id = :id', { id: transfer.allocationId })
         .setLock('pessimistic_write')
         .getOne();
 
       if (!oldAllocation || oldAllocation.status !== 'ACTIVE') {
-        throw new ApiError('CONFLICT', 409, 'Original allocation is no longer active');
+        throw new ApiError(
+          'CONFLICT',
+          409,
+          'Original allocation is no longer active',
+        );
       }
 
       // Close old allocation
@@ -149,13 +191,15 @@ export class AllocationsService {
       await queryRunner.manager.save(oldAllocation);
 
       // Create new allocation
-      const newAllocation = queryRunner.manager.getRepository(Allocation).create({
-        assetId: transfer.assetId,
-        employeeId: transfer.toEmployeeId,
-        departmentId: transfer.toDepartmentId,
-        createdBy: actor.id, // The approver or the requester? Let's say approver.
-        status: 'ACTIVE',
-      });
+      const newAllocation = queryRunner.manager
+        .getRepository(Allocation)
+        .create({
+          assetId: transfer.assetId,
+          employeeId: transfer.toEmployeeId,
+          departmentId: transfer.toDepartmentId,
+          createdBy: actor.id, // The approver or the requester? Let's say approver.
+          status: 'ACTIVE',
+        });
       await queryRunner.manager.save(newAllocation);
 
       // Update transfer status
@@ -175,8 +219,15 @@ export class AllocationsService {
   }
 
   async rejectTransfer(id: string, dto: RejectTransferDto, actor: any) {
-    const transfer = await this.dataSource.getRepository(TransferRequest).findOne({ where: { id, status: 'REQUESTED' } });
-    if (!transfer) throw new ApiError('NOT_FOUND', 404, 'Pending transfer request not found');
+    const transfer = await this.dataSource
+      .getRepository(TransferRequest)
+      .findOne({ where: { id, status: 'REQUESTED' } });
+    if (!transfer)
+      throw new ApiError(
+        'NOT_FOUND',
+        404,
+        'Pending transfer request not found',
+      );
 
     transfer.status = 'REJECTED';
     // optionally save the reason in a note field if it existed

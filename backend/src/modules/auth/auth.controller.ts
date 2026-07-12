@@ -16,6 +16,8 @@ import {
   RefreshTokenDto,
 } from './auth.dto';
 import { CurrentUser } from '../../common/decorators';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 /**
  * Auth endpoints per Spec 02 §1.
@@ -57,9 +59,10 @@ export class AuthController {
 
   /**
    * POST /auth/logout
-   * Invalidates refresh token.
+   * Invalidates refresh token. Requires authentication.
    */
   @Post('logout')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Body() dto: RefreshTokenDto) {
     return this.authService.logout(dto);
@@ -87,9 +90,10 @@ export class AuthController {
 
   /**
    * GET /auth/me
-   * Returns current user profile + role + department.
+   * Returns current user profile + role + department. Requires authentication.
    */
   @Get('me')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async getMe(@CurrentUser() user: any) {
     return this.authService.getProfile(user.id);
   }

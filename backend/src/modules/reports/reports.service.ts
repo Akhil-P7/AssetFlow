@@ -7,20 +7,27 @@ export class ReportsService {
   constructor(private readonly repository: ReportsRepository) {}
 
   async getUtilization(query: any) {
-    return [];
+    return this.repository.getUtilization(query.startDate, query.endDate);
   }
+
   async getMaintenanceFrequency(query: any) {
-    return [];
+    return this.repository.getMaintenanceFrequency();
   }
+
   async getUpcomingLifecycle() {
-    return [];
+    return this.repository.getUpcomingLifecycle();
   }
+
   async getDepartmentSummary(actor: any) {
-    return [];
+    // Dept heads only see their own department
+    const deptId = actor?.role === 'DEPARTMENT_HEAD' ? actor.departmentId : undefined;
+    return this.repository.getDepartmentSummary(deptId);
   }
+
   async getBookingHeatmap() {
-    return [];
+    return this.repository.getBookingHeatmap();
   }
+
   async exportReport(name: string, format: string, res: any) {
     const safeReportName = String(name ?? '').replace(/[^a-zA-Z0-9._-]/g, '_');
 

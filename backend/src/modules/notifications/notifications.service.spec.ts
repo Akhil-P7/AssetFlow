@@ -7,7 +7,11 @@ describe('NotificationsService', () => {
   let service: NotificationsService;
   let repository: jest.Mocked<NotificationsRepository>;
 
-  const mockActor = { id: 'recipient-123', role: 'EMPLOYEE', departmentId: null };
+  const mockActor = {
+    id: 'recipient-123',
+    role: 'EMPLOYEE',
+    departmentId: null,
+  };
 
   const mockRepository = {
     findByRecipient: jest.fn(),
@@ -41,10 +45,18 @@ describe('NotificationsService', () => {
       const mockResult = { data: [], total: 0 };
       repository.findByRecipient.mockResolvedValue(mockResult);
 
-      const result = await service.findAll({ page: '2', limit: '10', status: 'unread' }, mockActor);
+      const result = await service.findAll(
+        { page: '2', limit: '10', status: 'unread' },
+        mockActor,
+      );
 
       expect(result).toEqual(mockResult);
-      expect(repository.findByRecipient).toHaveBeenCalledWith('recipient-123', 'unread', 2, 10);
+      expect(repository.findByRecipient).toHaveBeenCalledWith(
+        'recipient-123',
+        'unread',
+        2,
+        10,
+      );
     });
 
     it('should throw unauthorized error if actor is not provided', async () => {
@@ -54,7 +66,11 @@ describe('NotificationsService', () => {
 
   describe('markRead', () => {
     it('should mark an unread notification as read', async () => {
-      const mockNotif = { id: 'notif-1', recipientId: 'recipient-123', readAt: null } as any;
+      const mockNotif = {
+        id: 'notif-1',
+        recipientId: 'recipient-123',
+        readAt: null,
+      } as any;
       repository.findOneByIdAndRecipient.mockResolvedValue(mockNotif);
       repository.save.mockResolvedValue({ ...mockNotif, readAt: new Date() });
 
@@ -67,7 +83,9 @@ describe('NotificationsService', () => {
     it('should throw not found error if notification not found for actor', async () => {
       repository.findOneByIdAndRecipient.mockResolvedValue(null);
 
-      await expect(service.markRead('notif-1', mockActor)).rejects.toThrow(ApiError);
+      await expect(service.markRead('notif-1', mockActor)).rejects.toThrow(
+        ApiError,
+      );
     });
   });
 
@@ -87,10 +105,17 @@ describe('NotificationsService', () => {
       const mockNotif = { id: 'notif-1' } as any;
       repository.createNotification.mockResolvedValue(mockNotif);
 
-      const result = await service.create('recipient-123', 'ASSET_ASSIGNED', { assetTag: 'AF-100' });
+      const result = await service.create('recipient-123', 'ASSET_ASSIGNED', {
+        assetTag: 'AF-100',
+      });
 
       expect(result).toEqual(mockNotif);
-      expect(repository.createNotification).toHaveBeenCalledWith('recipient-123', 'ASSET_ASSIGNED', { assetTag: 'AF-100' }, undefined);
+      expect(repository.createNotification).toHaveBeenCalledWith(
+        'recipient-123',
+        'ASSET_ASSIGNED',
+        { assetTag: 'AF-100' },
+        undefined,
+      );
     });
   });
 });

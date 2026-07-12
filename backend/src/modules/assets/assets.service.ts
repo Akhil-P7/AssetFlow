@@ -1,6 +1,9 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { AssetsRepository } from './assets.repository';
-import { assertValidTransition, AssetStatus } from '../../shared/state-machine/asset-transitions';
+import {
+  assertValidTransition,
+  AssetStatus,
+} from '../../shared/state-machine/asset-transitions';
 import { DataSource } from 'typeorm';
 import { Asset } from './asset.entity';
 import { ApiError } from '../../common/exceptions/api-error.exception';
@@ -24,7 +27,9 @@ export class AssetsService {
   }
 
   async findOne(id: string) {
-    const asset = await this.dataSource.getRepository(Asset).findOne({ where: { id } });
+    const asset = await this.dataSource
+      .getRepository(Asset)
+      .findOne({ where: { id } });
     if (!asset) throw new NotFoundException('Asset not found');
     return asset;
   }
@@ -34,7 +39,9 @@ export class AssetsService {
   }
 
   async findByTag(tag: string) {
-    const asset = await this.dataSource.getRepository(Asset).findOne({ where: { assetTag: tag } });
+    const asset = await this.dataSource
+      .getRepository(Asset)
+      .findOne({ where: { assetTag: tag } });
     if (!asset) throw new NotFoundException('Asset not found');
     return asset;
   }
@@ -42,7 +49,11 @@ export class AssetsService {
   async create(dto: CreateAssetDto, actor: any) {
     const repo = this.dataSource.getRepository(Asset);
     // Generate an asset tag and mock QR url
-    const assetTag = 'AF-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const assetTag =
+      'AF-' +
+      Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, '0');
     const asset = repo.create({
       ...dto,
       assetTag,
@@ -67,10 +78,19 @@ export class AssetsService {
    * Called by this module's controller AND by other modules' services.
    * Validates the transition against the state machine first.
    */
-  async transitionStatus(assetId: string, toStatus: AssetStatus, event: string, actorRole: string, reason?: string, tx?: any) {
-    this.logger.log(`Transitioning asset ${assetId} status to ${toStatus} via ${event}`);
+  async transitionStatus(
+    assetId: string,
+    toStatus: AssetStatus,
+    event: string,
+    actorRole: string,
+    reason?: string,
+    tx?: any,
+  ) {
+    this.logger.log(
+      `Transitioning asset ${assetId} status to ${toStatus} via ${event}`,
+    );
     const queryRunner = tx || this.dataSource.createQueryRunner();
-    
+
     if (!tx) {
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -78,7 +98,8 @@ export class AssetsService {
 
     try {
       // Row-level lock the asset
-      const asset = await queryRunner.manager.getRepository(Asset)
+      const asset = await queryRunner.manager
+        .getRepository(Asset)
         .createQueryBuilder('asset')
         .where('asset.id = :assetId', { assetId })
         .setLock('pessimistic_write')
@@ -86,13 +107,18 @@ export class AssetsService {
 
       if (!asset) throw new NotFoundException('Asset not found');
 
-      assertValidTransition(asset.status as AssetStatus, toStatus, event, actorRole);
+      assertValidTransition(
+        asset.status as AssetStatus,
+        toStatus,
+        event,
+        actorRole,
+      );
 
       asset.status = toStatus;
       await queryRunner.manager.save(asset);
-      
+
       // Optionally log manual overrides in activity log here if reason is provided
-      
+
       if (!tx) await queryRunner.commitTransaction();
       return asset;
     } catch (err) {

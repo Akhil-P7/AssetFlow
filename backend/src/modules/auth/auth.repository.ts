@@ -12,14 +12,20 @@ export class AuthRepository {
   constructor(private readonly dataSource: DataSource) {}
 
   async findEmployeeByEmail(email: string) {
-    return this.dataSource.getRepository(Employee).findOne({ where: { email } });
+    return this.dataSource
+      .getRepository(Employee)
+      .findOne({ where: { email } });
   }
 
   async findEmployeeById(id: string) {
     return this.dataSource.getRepository(Employee).findOne({ where: { id } });
   }
 
-  async createEmployee(data: { name: string; email: string; passwordHash: string }) {
+  async createEmployee(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }) {
     const repo = this.dataSource.getRepository(Employee);
     const employee = repo.create({
       name: data.name,
@@ -31,7 +37,11 @@ export class AuthRepository {
     return repo.save(employee);
   }
 
-  async storeRefreshToken(employeeId: string, tokenHash: string, expiresAt: Date) {
+  async storeRefreshToken(
+    employeeId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ) {
     const repo = this.dataSource.getRepository(RefreshToken);
     const token = repo.create({
       employeeId,
@@ -42,14 +52,20 @@ export class AuthRepository {
   }
 
   async findRefreshToken(tokenHash: string) {
-    return this.dataSource.getRepository(RefreshToken).findOne({ where: { tokenHash } });
+    return this.dataSource
+      .getRepository(RefreshToken)
+      .findOne({ where: { tokenHash } });
   }
 
   async revokeRefreshToken(tokenId: string) {
-    await this.dataSource.getRepository(RefreshToken).update(tokenId, { isRevoked: true });
+    await this.dataSource
+      .getRepository(RefreshToken)
+      .update(tokenId, { isRevoked: true });
   }
 
   async revokeAllRefreshTokens(employeeId: string) {
-    await this.dataSource.getRepository(RefreshToken).update({ employeeId }, { isRevoked: true });
+    await this.dataSource
+      .getRepository(RefreshToken)
+      .update({ employeeId }, { isRevoked: true });
   }
 }

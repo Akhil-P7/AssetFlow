@@ -8,8 +8,10 @@ import { CategoriesRepository } from './categories/categories.repository';
 import { EmployeesController } from './employees/employees.controller';
 import { EmployeesService } from './employees/employees.service';
 import { EmployeesRepository } from './employees/employees.repository';
+import { ActivityLogModule } from '../activity-log/activity-log.module';
 
 @Module({
+  imports: [ActivityLogModule],
   controllers: [
     DepartmentsController,
     CategoriesController,

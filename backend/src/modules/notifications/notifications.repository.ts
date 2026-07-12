@@ -34,7 +34,10 @@ export class NotificationsRepository {
     return { data, total };
   }
 
-  async findOneByIdAndRecipient(id: string, recipientId: string): Promise<Notification | null> {
+  async findOneByIdAndRecipient(
+    id: string,
+    recipientId: string,
+  ): Promise<Notification | null> {
     return this.repository.findOne({
       where: { id, recipientId },
     });
@@ -59,7 +62,9 @@ export class NotificationsRepository {
     payload: Record<string, any>,
     manager?: EntityManager,
   ): Promise<Notification> {
-    const repo = manager ? manager.getRepository(Notification) : this.repository;
+    const repo = manager
+      ? manager.getRepository(Notification)
+      : this.repository;
     const notification = repo.create({
       recipientId,
       type,

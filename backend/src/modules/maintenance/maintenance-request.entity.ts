@@ -36,7 +36,12 @@ export class MaintenanceRequest {
   @Column({ name: 'approved_by', type: 'uuid', nullable: true })
   approvedBy?: string | null;
 
-  @Column({ name: 'technician_name', type: 'varchar', length: 120, nullable: true })
+  @Column({
+    name: 'technician_name',
+    type: 'varchar',
+    length: 120,
+    nullable: true,
+  })
   technicianName?: string | null;
 
   @Column({ name: 'resolved_at', type: 'timestamptz', nullable: true })

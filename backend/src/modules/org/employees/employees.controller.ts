@@ -9,7 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { Roles, RefetchRole } from '../../../common/decorators';
+import { PromoteEmployeeDto } from './employees.dto';
+import { Roles, RefetchRole, CurrentUser } from '../../../common/decorators';
 
 /** Employee Directory + Role Promotion — Spec 02 §2.3 */
 @Controller('org/employees')
@@ -40,7 +41,11 @@ export class EmployeesController {
   @Post(':id/promote')
   @Roles('ADMIN')
   @RefetchRole()
-  promote(@Param('id') id: string, @Body() dto: any) {
-    return this.service.promote(id, dto);
+  promote(
+    @Param('id') id: string,
+    @Body() dto: PromoteEmployeeDto,
+    @CurrentUser() actor: any,
+  ) {
+    return this.service.promote(id, dto, actor);
   }
 }

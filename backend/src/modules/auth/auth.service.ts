@@ -1,6 +1,12 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
-import { SignupDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, RefreshTokenDto } from './auth.dto';
+import {
+  SignupDto,
+  LoginDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  RefreshTokenDto,
+} from './auth.dto';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
 import { JwtService } from '@nestjs/jwt';
@@ -29,10 +35,10 @@ export class AuthService {
       email: dto.email,
       passwordHash,
     });
-    
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _, ...userWithoutPassword } = employee;
-    return { success: true, data: userWithoutPassword };
+    return userWithoutPassword;
   }
 
   async login(dto: LoginDto) {
@@ -42,7 +48,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await argon2.verify(employee.passwordHash, dto.password);
+    const isPasswordValid = await argon2.verify(
+      employee.passwordHash,
+      dto.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -51,14 +60,24 @@ export class AuthService {
   }
 
   async refreshToken(dto: RefreshTokenDto) {
-    const hashedDtoToken = crypto.createHash('sha256').update(dto.refreshToken).digest('hex');
-    const tokenRecord = await this.authRepository.findRefreshToken(hashedDtoToken);
+    const hashedDtoToken = crypto
+      .createHash('sha256')
+      .update(dto.refreshToken)
+      .digest('hex');
+    const tokenRecord =
+      await this.authRepository.findRefreshToken(hashedDtoToken);
 
-    if (!tokenRecord || tokenRecord.isRevoked || tokenRecord.expiresAt < new Date()) {
+    if (
+      !tokenRecord ||
+      tokenRecord.isRevoked ||
+      tokenRecord.expiresAt < new Date()
+    ) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const employee = await this.authRepository.findEmployeeById(tokenRecord.employeeId);
+    const employee = await this.authRepository.findEmployeeById(
+      tokenRecord.employeeId,
+    );
     if (!employee || employee.status !== 'ACTIVE') {
       throw new UnauthorizedException('Invalid user');
     }
@@ -69,23 +88,29 @@ export class AuthService {
   }
 
   async logout(dto: RefreshTokenDto) {
-    const hashedDtoToken = crypto.createHash('sha256').update(dto.refreshToken).digest('hex');
-    const tokenRecord = await this.authRepository.findRefreshToken(hashedDtoToken);
-    
+    const hashedDtoToken = crypto
+      .createHash('sha256')
+      .update(dto.refreshToken)
+      .digest('hex');
+    const tokenRecord =
+      await this.authRepository.findRefreshToken(hashedDtoToken);
+
     if (tokenRecord) {
       await this.authRepository.revokeRefreshToken(tokenRecord.id);
     }
-    return { success: true };
+    return { message: 'Logged out successfully' };
   }
 
   async forgotPassword(dto: ForgotPasswordDto) {
     // Always return success regardless of whether email exists (prevent enumeration)
-    return { success: true, message: 'If that email exists, a reset link was sent' };
+    return {
+      message: 'If that email exists, a reset link was sent',
+    };
   }
 
   async resetPassword(dto: ResetPasswordDto) {
     // TODO: Full implementation involves sending/verifying reset token. For this mock just return success.
-    return { success: true };
+    return { message: 'Password reset successfully' };
   }
 
   async getProfile(userId: string) {
@@ -93,10 +118,10 @@ export class AuthService {
     if (!employee) {
       throw new UnauthorizedException('User not found');
     }
-    
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...user } = employee;
-    return { success: true, data: user };
+    return user;
   }
 
   private async generateTokens(employee: any) {
@@ -107,26 +132,30 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    
+
     // Generate opaque refresh token
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    const hashedRefreshToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    
+    const hashedRefreshToken = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days TTL
 
-    await this.authRepository.storeRefreshToken(employee.id, hashedRefreshToken, expiresAt);
+    await this.authRepository.storeRefreshToken(
+      employee.id,
+      hashedRefreshToken,
+      expiresAt,
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash: _, ...user } = employee;
 
     return {
-      success: true,
-      data: {
-        accessToken,
-        refreshToken,
-        user,
-      }
+      accessToken,
+      refreshToken,
+      user,
     };
   }
 }
