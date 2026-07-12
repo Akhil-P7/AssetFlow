@@ -17,6 +17,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ActivityLogModule } from './modules/activity-log/activity-log.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { CronModule } from './modules/cron/cron.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ActivityLogModule,
     ReportsModule,
     DashboardModule,
+    CronModule,
   ],
 })
 export class AppModule {}
