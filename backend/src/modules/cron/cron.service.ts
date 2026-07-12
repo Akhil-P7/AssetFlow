@@ -104,4 +104,101 @@ export class CronService {
       await queryRunner.release();
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async escalateMaintenanceJob() {
+    this.logger.log('Running EscalateMaintenanceJob');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      // Find requests pending/in_progress for > 7 days
+      const stagnantRequests = await queryRunner.manager.query(`
+        SELECT m.id, m.raised_by, m.priority, m.status, m.asset_id
+        FROM maintenance_request m
+        WHERE m.status IN ('PENDING', 'IN_PROGRESS')
+          AND m.created_at < NOW() - INTERVAL '7 days'
+          AND NOT EXISTS (
+            SELECT 1 FROM activity_log al 
+            WHERE al.entity_id = m.id 
+              AND al.action_type = 'MAINTENANCE_ESCALATED'
+          )
+      `);
+
+      for (const req of stagnantRequests) {
+        await queryRunner.startTransaction();
+        try {
+          const newPriority = req.priority === 'LOW' ? 'MEDIUM' : (req.priority === 'MEDIUM' ? 'HIGH' : 'CRITICAL');
+          
+          await queryRunner.manager.query(`
+            UPDATE maintenance_request 
+            SET priority = $1, updated_at = NOW() 
+            WHERE id = $2
+          `, [newPriority, req.id]);
+
+          await queryRunner.manager.query(`
+            INSERT INTO activity_log (entity_type, entity_id, action_type, performed_by, payload, created_at)
+            VALUES ('MAINTENANCE', $1, 'MAINTENANCE_ESCALATED', 'SYSTEM', $2, NOW())
+          `, [req.id, JSON.stringify({ oldPriority: req.priority, newPriority })]);
+
+          await queryRunner.manager.query(`
+            INSERT INTO notification (recipient_id, type, payload, created_at)
+            VALUES ($1, 'MAINTENANCE_ESCALATED', $2, NOW())
+          `, [req.raised_by, JSON.stringify({ maintenanceId: req.id, assetId: req.asset_id, priority: newPriority })]);
+
+          await queryRunner.commitTransaction();
+        } catch (err) {
+          await queryRunner.rollbackTransaction();
+          this.logger.error(`Failed to escalate maintenance ${req.id}`, err);
+        }
+      }
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async closeAuditCyclesJob() {
+    this.logger.log('Running CloseAuditCyclesJob');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+
+    try {
+      // Close open cycles where end_date is past
+      const expiredCycles = await queryRunner.manager.query(`
+        SELECT a.id, a.created_by
+        FROM audit_cycle a
+        WHERE a.status = 'OPEN'
+          AND a.end_date < CURRENT_DATE
+      `);
+
+      for (const cycle of expiredCycles) {
+        await queryRunner.startTransaction();
+        try {
+          await queryRunner.manager.query(`
+            UPDATE audit_cycle 
+            SET status = 'CLOSED', closed_at = NOW(), updated_at = NOW() 
+            WHERE id = $1
+          `, [cycle.id]);
+
+          await queryRunner.manager.query(`
+            INSERT INTO activity_log (entity_type, entity_id, action_type, performed_by, payload, created_at)
+            VALUES ('AUDIT_CYCLE', $1, 'AUDIT_CLOSED', 'SYSTEM', '{}', NOW())
+          `, [cycle.id]);
+
+          await queryRunner.manager.query(`
+            INSERT INTO notification (recipient_id, type, payload, created_at)
+            VALUES ($1, 'AUDIT_CYCLE_CLOSED', $2, NOW())
+          `, [cycle.created_by, JSON.stringify({ auditCycleId: cycle.id })]);
+
+          await queryRunner.commitTransaction();
+        } catch (err) {
+          await queryRunner.rollbackTransaction();
+          this.logger.error(`Failed to close audit cycle ${cycle.id}`, err);
+        }
+      }
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }
