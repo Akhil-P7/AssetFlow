@@ -6,7 +6,7 @@ import { Input, Select, Textarea } from '@/components/ui/Input';
 import { Badge, AssetStatusBadge, TransferStatusBadge } from '@/components/ui/Badge';
 import { TabBar } from '@/components/ui/TabBar';
 import { PageLoader, EmptyState } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { Allocation, TransferRequest, Asset, Employee } from '@/types';
 import { AllocationStatus, AssetStatus } from '@/types';
 
@@ -23,10 +23,10 @@ export function AllocationsPage() {
   useEffect(() => {
     (async () => {
       const [allocs, trans, assetData, empData] = await Promise.all([
-        mockApi.getAllocations(),
-        mockApi.getTransfers(),
-        mockApi.getAssets(),
-        mockApi.getEmployees(),
+        (await apiClient.get('/allocations')) as Allocation[],
+        (await apiClient.get('/allocations/transfers')) as TransferRequest[],
+        (await apiClient.get('/assets')) as Asset[],
+        (await apiClient.get('/org/employees')) as Employee[],
       ]);
       setAllocations(allocs);
       setTransfers(trans);
