@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U assetflow -d assetflow_prod']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-assetflow} -d ${POSTGRES_DB:-assetflow_prod}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,17 +43,17 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: ${POSTGRES_USER:-assetflow}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-assetflow_prod_secret}
-      DB_DATABASE: ${POSTGRES_DB:-assetflow_prod}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${POSTGRES_USER:-assetflow}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-assetflow_prod_secret}
+      DATABASE_NAME: ${POSTGRES_DB:-assetflow_prod}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET:-fallback_secret_key_change_me}
-      JWT_EXPIRES_IN: 1h
+      JWT_ACCESS_SECRET: ${JWT_SECRET:-fallback_secret_key_change_me}
+      ACCESS_TOKEN_TTL: 1h
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-fallback_refresh_key_change_me}
-      JWT_REFRESH_EXPIRES_IN: 7d
+      REFRESH_TOKEN_TTL: 7d
     ports:
       - '3000:3000'
     depends_on:

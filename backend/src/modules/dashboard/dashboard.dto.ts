@@ -7,4 +7,5 @@ export interface DashboardKpis {
   pendingTransfers: number;
   upcomingReturns: number;
   overdueReturns: number;
+  totalAssets: number;
 }

@@ -171,7 +171,7 @@ export class CronService {
           AND NOT EXISTS (
             SELECT 1 FROM activity_log al 
             WHERE al.entity_id = m.id 
-              AND al.action_type = 'MAINTENANCE_ESCALATED'
+              AND al.action = 'MAINTENANCE_ESCALATED'
           )
       `);
 
@@ -187,8 +187,8 @@ export class CronService {
           `, [newPriority, req.id]);
 
           await queryRunner.manager.query(`
-            INSERT INTO activity_log (entity_type, entity_id, action_type, performed_by, payload, created_at)
-            VALUES ('MAINTENANCE', $1, 'MAINTENANCE_ESCALATED', 'SYSTEM', $2, NOW())
+            INSERT INTO activity_log (entity_type, entity_id, action, actor_id, metadata)
+            VALUES ('MAINTENANCE', $1, 'MAINTENANCE_ESCALATED', NULL, $2)
           `, [req.id, JSON.stringify({ oldPriority: req.priority, newPriority })]);
 
           await queryRunner.manager.query(`
@@ -232,8 +232,8 @@ export class CronService {
           `, [cycle.id]);
 
           await queryRunner.manager.query(`
-            INSERT INTO activity_log (entity_type, entity_id, action_type, performed_by, payload, created_at)
-            VALUES ('AUDIT_CYCLE', $1, 'AUDIT_CLOSED', 'SYSTEM', '{}', NOW())
+            INSERT INTO activity_log (entity_type, entity_id, action, actor_id, metadata)
+            VALUES ('AUDIT_CYCLE', $1, 'AUDIT_CLOSED', NULL, '{}')
           `, [cycle.id]);
 
           await queryRunner.manager.query(`
