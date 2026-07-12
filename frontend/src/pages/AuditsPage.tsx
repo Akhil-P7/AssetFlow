@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { AuditCycleStatusBadge } from '@/components/ui/Badge';
 import { PageLoader, EmptyState } from '@/components/ui/LoadingSpinner';
-import { mockApi } from '@/lib/mock-api';
+import apiClient from '@/api/apiClient';
 import type { AuditCycle } from '@/types';
 
 export function AuditsPage() {
@@ -13,7 +13,7 @@ export function AuditsPage() {
 
   useEffect(() => {
     (async () => {
-      const data = await mockApi.getAuditCycles();
+      const data = (await apiClient.get('/audits')) as AuditCycle[];
       setCycles(data);
       setLoading(false);
     })();
